@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indovina la Parola - Wikizionario</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .timer-settings {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #e8f4fd;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .timer-setting-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .timer-settings label {
+            font-weight: bold;
+            color: #2c3e50;
+            white-space: nowrap;
+        }
+
+        .timer-settings input {
+            width: 80px;
+            padding: 8px;
+            font-size: 16px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .timer-settings button {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 20px 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .timer-display.warning {
+            color: #f39c12;
+            animation: pulse 0.5s infinite;
+        }
+
+        .timer-display.danger {
+            color: #e74c3c;
+            animation: pulse 0.3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* DEFINIZIONE - MOLTO PIÙ GRANDE E VISIBILE */
+        .definition-box {
+            font-size: 42px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0;
+            padding: 40px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            border: 4px solid rgba(255,255,255,0.3);
+        }
+
+        .word-container {
+            font-size: 36px;
+            letter-spacing: 8px;
+            margin: 30px 0;
+            font-family: 'Courier New', Courier, monospace;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .letter {
+            display: inline-block;
+            min-width: 25px;
+            text-align: center;
+        }
+
+        .letter.revealed {
+            color: #27ae60;
+        }
+
+        .letter.hidden-final {
+            color: #e74c3c;
+            font-style: italic;
+        }
+
+        .underscore {
+            border-bottom: 4px solid #34495e;
+            display: inline-block;
+            width: 25px;
+            margin: 0 3px;
+            height: 30px;
+        }
+
+        .input-section {
+            margin: 30px 0;
+        }
+
+        .word-input {
+            width: 80%;
+            padding: 15px;
+            font-size: 20px;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .word-input:focus {
+            outline: none;
+            border-color: #27ae60;
+            box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
+        }
+
+        .word-input.correct {
+            border-color: #27ae60;
+            background-color: #d4edda;
+        }
+
+        .word-input.wrong {
+            border-color: #e74c3c;
+            background-color: #f8d7da;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .btn-new {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .message.correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .message.wrong {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .message.timeout {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .source-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background-color: #e8f4fd;
+            color: #3498db;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #f39c12, #e74c3c);
+            transition: width 1s linear;
+        }
+
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-over-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .game-over h2 {
+            color: #e74c3c;
+            font-size: 36px;
+        }
+
+        .final-score {
+            font-size: 48px;
+            color: #27ae60;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .hint-text {
+            font-size: 14px;
+            color: #e74c3c;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-info {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+
+        /* Icona domanda prima della definizione */
+        .definition-icon {
+            font-size: 48px;
+            margin-right: 20px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎯 Indovina la Parola</h1>
+    
+    <div class="score-board">
+        <div class="score-item">
+            <div class="score-value" id="score">0</div>
+            <div class="score-label">Parole Indovinate</div>
+        </div>
+        <div class="score-item">
+            <div class="score-value" id="attempts">0</div>
+            <div class="score-label">Tentativi</div>
+        </div>
+    </div>
+
+    <div class="timer-settings">
+        <div class="timer-setting-group">
+            <label for="timerInput">⏱️ Tempo totale:</label>
+            <input type="number" id="timerInput" value="60" min="10" max="300">
+            <span>sec</span>
+        </div>
+        <div class="timer-setting-group">
+            <label for="letterIntervalInput">🔤 Cadenza lettere:</label>
+            <input type="number" id="letterIntervalInput" value="4" min="1" max="60">
+            <span>sec</span>
+        </div>
+        <button onclick="updateSettings()">Imposta</button>
+    </div>
+
+    <div class="timer-display" id="timerDisplay">60</div>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 100%"></div>
+    </div>
+
+    <div class="source-badge" id="source-badge">📚 Wikizionario</div>
+    
+    <!-- DEFINIZIONE MOLTO PIÙ GRANDE E VISIBILE -->
+    <div class="definition-box" id="definition">
+        <span class="loading-spinner"></span>Caricamento da Wikizionario...
+    </div>
+
+    <div class="word-container" id="word-display">
+        <!-- Lettere e lineette -->
+    </div>
+    <div class="hint-text" id="hintText">🔒 L'ultima lettera non verrà mai rivelata!</div>
+    <div class="stats-info" id="statsInfo">Parole usate: 0 / 500+</div>
+
+    <div class="input-section">
+        <input type="text" class="word-input" id="wordInput" placeholder="Scrivi la parola qui..." disabled>
+    </div>
+
+    <div id="messageContainer"></div>
+
+    <div class="buttons">
+        <button class="btn-start" id="btnStart" onclick="startTimer()">▶️ Avvia Timer</button>
+        <button class="btn-stop" id="btnStop" onclick="submitAnswer()" disabled>⏹️ STOP</button>
+        <button class="btn-new" id="btnNew" onclick="newGame()">🔄 Nuova Parola</button>
+    </div>
+</div>
+
+<div class="game-over" id="gameOver">
+    <div class="game-over-content">
+        <h2>⏰ TEMPO SCADUTO!</h2>
+        <p>Punteggio Finale:</p>
+        <div class="final-score" id="finalScore">0</div>
+        <p>Tentativi totali: <span id="finalAttempts">0</span></p>
+        <button class="btn-new" onclick="resetGame()">🔄 Ricomincia</button>
+    </div>
+</div>
+
+<script>
+    // Database ESPANSO di oltre 500 parole italiane comuni
+    const wiktionaryWords = [
+        // Casa e oggetti
+        "casa", "porta", "finestra", "tetto", "muro", "pavimento", "soffitto",
+        "tavolo", "sedia", "letto", "armadio", "cassetto", "mensola", "specchio",
+        "lampada", "luce", "interruttore", "presa", "cavo", "filo", "chiave",
+        "serratura", "maniglia", "tappeto", "tenda", "cuscino", "coperta",
+        "lenzuolo", "asciugamano", "sapone", "spazzolino", "pettine", "specchio",
+        "orologio", "sveglia", "calendario", "quadro", "foto", "cornice",
+        "libro", "quaderno", "penna", "matita", "gomma", "righello", "forbici",
+        "colla", "nastro", "carta", "busta", "pacco", "scatola", "sacco",
+        
+        // Cucina
+        "cucina", "forno", "frigo", "fornello", "pentola", "padella", "tegame",
+        "piatto", "bicchiere", "tazza", "posata", "forchetta", "coltello",
+        "cucchiaio", "mestolo", "grattugia", "taglieri", "canovaccio", "tovaglia",
+        "tovagliolo", "salvietta", "grembiule", "guanto", "presina",
+        
+        // Cibi
+        "pane", "pasta", "riso", "pizza", "carne", "pesce", "uovo", "formaggio",
+        "burro", "olio", "sale", "pepe", "zucchero", "miele", "marmellata",
+        "latte", "yogurt", "acqua", "vino", "birra", "caffè", "tè", "succo",
+        "frutta", "mela", "pera", "banana", "arancia", "limone", "uva",
+        "fragola", "ciliegia", "pesca", "albicocca", "prugna", "anguria",
+        "melone", "kiwi", "ananas", "cocco", "dattero", "fico", "gelso",
+        "verdura", "insalata", "pomodoro", "patata", "cipolla", "aglio",
+        "carota", "zucchina", "melanzana", "peperone", "cavolo", "broccolo",
+        "spinacio", "fagiolo", "pisello", "lenticchia", "cece", "soia",
+        
+        // Animali
+        "cane", "gatto", "topo", "coniglio", "criceto", "cavia", "furetto",
+        "cavallo", "mucca", "toro", "vitello", "pecora", "agnello", "capra",
+        "maiale", "pollo", "gallina", "tacchino", "anatra", "oca", "piccione",
+        "passero", "rondine", "aquila", "falco", "gufo", "civetta", "corvo",
+        "gabbiano", "pappagallo", "canarino", "pavone", "fagiano", "pernice",
+        "leone", "tigre", "leopardo", "ghepardo", "giaguaro", "pantera",
+        "orso", "lupo", "volpe", "sciacallo", "iena", "iena", "coccodrillo",
+        "serpente", "vipera", "python", "cobra", "lucertola", "camaleonte",
+        "tartaruga", "rana", "rospo", "salamandra", "pesce", "squalo",
+        "balena", "delfino", "foca", "tricheco", "pinguino", "struzzo",
+        "elefante", "giraffa", "zebra", "rinoceronte", "ippopotamo",
+        "scimmia", "gorilla", "orangotango", "babbuino", "lemure",
+        "canguro", "koala", "panda", "procione", "tasso", "lontra",
+        "castoro", "scoiattolo", "istrice", "riccio", "talpa", "pipistrello",
+        
+        // Corpo umano
+        "testa", "capello", "capelli", "fronte", "tempia", "occhio", "occhi",
+        "ciglio", "sopracciglio", "naso", "bocca", "labbro", "dente", "denti",
+        "lingua", "gola", "mento", "guancia", "orecchio", "udito", "udire",
+        "collo", "spalla", "braccio", "gomito", "avambraccio", "polso",
+        "mano", "palmo", "dito", "pollice", "unghia", "pelle", "osso",
+        "scheletro", "muscolo", "sangue", "cuore", "polmone", "fegato",
+        "stomaco", "intestino", "reni", "vescica", "cervello", "nervo",
+        "gamba", "coscia", "ginocchio", "polpaccio", "caviglia", "piede",
+        "tacco", "pianta", "alluce", "mignolo", "schiena", "schiena",
+        "pancia", "ombelico", "fianco", "anca", "seno", "petto",
+        
+        // Vestiti
+        "vestito", "camicia", "maglia", "maglione", "felpa", "giacca",
+        "cappotto", "impermeabile", "pantaloni", "jeans", "gonna", "short",
+        "mutande", "calzini", "calze", "scarpe", "stivali", "sandali",
+        "ciabatte", "scarponi", "tacchi", "stringhe", "suola", "tacco",
+        "cappello", "berretto", "sciarpa", "guanti", "muffole", "cravatta",
+        "papillon", "cintura", "fibbia", "bottoni", "cerniera", "tasca",
+        "colletto", "manica", "polso", "orlo", "tessuto", "lana", "cotone",
+        "seta", "pelle", "cuoio", "nylon", "poliestere", "lino",
+        
+        // Città e luoghi
+        "città", "paese", "villaggio", "borgo", "quartiere", "centro",
+        "periferia", "piazza", "via", "viale", "corso", "strada", "vicolo",
+        "ponte", "tunnel", "galleria", "incrocio", "semaforo", "strisce",
+        "marciapiede", "cordolo", "aiuola", "giardino", "parco", "bosco",
+        "foresta", "monte", "collina", "valle", "pianura", "spiaggia",
+        "mare", "oceano", "lago", "fiume", "torrente", "ruscello", "fonte",
+        "isola", "penisola", "costa", "scogliera", "porto", "molo",
+        "aeroporto", "stazione", "fermata", "metropolitana", "autobus",
+        "tram", "treno", "taxi", "macchina", "auto", "moto", "bicicletta",
+        "negozio", "mercato", "supermercato", "centro commerciale",
+        "banca", "ufficio", "posta", "farmacia", "ospedale", "clinica",
+        "scuola", "università", "biblioteca", "museo", "teatro", "cinema",
+        "ristorante", "bar", "caffè", "pizzeria", "trattoria", "albergo",
+        "hotel", "pensione", "campeggio", "chiesa", "duomo", "cappella",
+        "cimitero", "palazzo", "castello", "villa", "fattoria", "cascina",
+        
+        // Natura
+        "natura", "ambiente", "ecologia", "inquinamento", "riciclaggio",
+        "albero", "pianta", "fiore", "foglia", "ramo", "tronco", "radice",
+        "corteccia", "legno", "legna", "seme", "frutto", "bacca", "noce",
+        "mandorla", "nocciola", "castagna", "pinolo", "ghirlanda", "corona",
+        "erba", "prato", "campo", "terreno", "suolo", "terra", "fango",
+        "polvere", "sabbia", "ghiaia", "pietra", "roccia", "sasso",
+        "minerali", "oro", "argento", "rame", "ferro", "acciaio",
+        "metallo", "plastica", "vetro", "cristallo", "ceramica", "porcellana",
+        
+        // Tempo
+        "tempo", "anno", "mese", "settimana", "giorno", "notte", "mattino",
+        "pomeriggio", "sera", "mezzogiorno", "mezzanotte", "alba", "tramonto",
+        "ora", "minuto", "secondo", "istante", "momento", "attimo",
+        "primavera", "estate", "autunno", "inverno", "stagione",
+        "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+        "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre",
+        "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato",
+        "domenica", "weekend", "festivo", "vacanza", "ferie", "riposo",
+        
+        // Meteo
+        "tempo", "meteo", "clima", "atmosfera", "aria", "vento", "brezza",
+        "uragano", "temporale", "tempesta", "pioggia", "acquazzone",
+        "goccia", "pozzanghera", "neve", "fiocco", "ghiaccio", "brina",
+        "gelo", "freddo", "caldo", "temperatura", "grado", "termometro",
+        "sole", "soleggiato", "nuvola", "nuvoloso", "cielo", "azzurro",
+        "grigio", "nero", "bianco", "arcobaleno", "baleno", "tuono",
+        "fulmine", "saetta", "nebbia", "foschia", "umidità", "secco",
+        
+        // Colori
+        "colore", "rosso", "arancione", "giallo", "verde", "blu", "azzurro",
+        "viola", "rosa", "marrone", "nero", "bianco", "grigio", "beige",
+        "oro", "argento", "bronzo", "rame", "crema", "avorio", "perla",
+        "corallo", "turchese", "indaco", "magenta", "ciano", "lime",
+        "oliva", "senape", "bordeaux", "scarlatto", "crimson", "ciano",
+        
+        // Numeri
+        "numero", "zero", "uno", "due", "tre", "quattro", "cinque",
+        "sei", "sette", "otto", "nove", "dieci", "undici", "dodici",
+        "tredici", "quattordici", "quindici", "sedici", "diciassette",
+        "diciotto", "diciannove", "venti", "trenta", "quaranta", "cinquanta",
+        "sessanta", "settanta", "ottanta", "novanta", "cento", "mille",
+        "milione", "miliardo", "primo", "secondo", "terzo", "ultimo",
+        
+        // Aggettivi comuni
+        "grande", "piccolo", "alto", "basso", "lungo", "corto", "largo",
+        "stretto", "profondo", "superficiale", "pesante", "leggero",
+        "forte", "debole", "duro", "morbido", "liscio", "ruvido",
+        "caldo", "freddo", "nuovo", "vecchio", "giovane", "anziano",
+        "bello", "brutto", "buono", "cattivo", "dolce", "amaro",
+        "salato", "aspro", "piccante", "delicato", "intenso", "leggero",
+        "veloce", "lento", "rapido", "immediato", "pronto", "tardi",
+        "presto", "subito", "adesso", "oggi", "domani", "ieri",
+        "sempre", "mai", "spesso", "raramente", "qualche", "nessuno",
+        "tutto", "intero", "completo", "parziale", "mezzo", "metà",
+        "pieno", "vuoto", "aperto", "chiuso", "libero", "occupato",
+        "facile", "difficile", "semplice", "complesso", "chiaro", "scuro",
+        "luminoso", "opaco", "trasparente", "opaco", "pulito", "sporco",
+        "ordinato", "disordinato", "nuovo", "usato", "rotto", "intatto",
+        "sicuro", "pericoloso", "tranquillo", "agitato", "calmo", "nervoso",
+        "felice", "triste", "allegro", "serio", "divertente", "noioso",
+        "interessante", "curioso", "strano", "normale", "speciale", "unico",
+        "comune", "raro", "frequente", "abitual", "straordinario",
+        
+        // Azioni comuni
+        "andare", "venire", "stare", "fare", "dire", "vedere", "guardare",
+        "ascoltare", "sentire", "toccare", "prendere", "dare", "mettere",
+        "levare", "aprire", "chiudere", "entrare", "uscire", "salire",
+        "scendere", "correre", "camminare", "saltare", "nuotare", "volare",
+        "cadere", "alzare", "abbassare", "spingere", "tirare", "girare",
+        "fermare", "iniziare", "finire", "cominciare", "continuare",
+        "aspettare", "cercare", "trovare", "perdere", "vincere", "giocare",
+        "lavorare", "studiare", "imparare", "insegnare", "leggere", "scrivere",
+        "parlare", "chiedere", "rispondere", "pensare", "sapere", "credere",
+        "volere", "potere", "dovere", "mangiare", "bere", "dormire",
+        "svegliare", "lavare", "vestire", "comprare", "vendere", "pagare",
+        "costare", "valere", "piacere", "amare", "odiare", "preferire",
+        "scegliere", "decidere", "provare", "riuscire", "fallire", "tentare"
+    ];
+
+    // Database locale di backup con definizioni
+    const localDatabase = [
+        { def: "Si vive dentro.", word: "CASA" },
+        { def: "Si apre e chiude per entrare.", word: "PORTA" },
+        { def: "Si guarda attraverso.", word: "FINESTRA" },
+        { def: "Copre la casa sopra.", word: "TETTO" },
+        { def: "Divide le stanze.", word: "MURO" },
+        { def: "Si cammina sopra.", word: "PAVIMENTO" },
+        { def: "Si mangia a pranzo.", word: "PASTA" },
+        { def: "Si beve per vivere.", word: "ACQUA" },
+        { def: "Si fa con la farina.", word: "PANE" },
+        { def: "È rotonda e italiana.", word: "PIZZA" },
+        { def: "Fa le fusa.", word: "GATTO" },
+        { def: "Abbaia.", word: "CANE" },
+        { def: "Re della giungla.", word: "LEONE" },
+        { def: "Ha il collo lungo.", word: "GIRAFFA" },
+        { def: "È il re degli animali.", word: "LEONE" },
+        { def: "Vive nel mare.", word: "PESCE" },
+        { def: "Volano nel cielo.", word: "UCCELLI" },
+        { def: "Si legge per studiare.", word: "LIBRO" },
+        { def: "Si scrive con questa.", word: "PENNA" },
+        { def: "Segna le ore.", word: "OROLOGIO" },
+        { def: "Si indossa ai piedi.", word: "SCARPE" },
+        { def: "Copre la testa.", word: "CAPPELLO" },
+        { def: "Si mette quando piove.", word: "IMPERMEABILE" },
+        { def: "È il colore del cielo.", word: "AZZURRO" },
+        { def: "È il colore dell'erba.", word: "VERDE" },
+        { def: "È il colore del sangue.", word: "ROSSO" },
+        { def: "È il colore della neve.", word: "BIANCO" },
+        { def: "È il colore della notte.", word: "NERO" },
+        { def: "Opposto di grande.", word: "PICCOLO" },
+        { def: "Opposto di alto.", word: "BASSO" },
+        { def: "Opposto di veloce.", word: "LENTO" },
+        { def: "Opposto di caldo.", word: "FREDDO" },
+        { def: "Opposto di nuovo.", word: "VECCHIO" },
+        { def: "Opposto di buono.", word: "CATTIVO" },
+        { def: "Opposto di bello.", word: "BRUTTO" },
+        { def: "Opposto di felice.", word: "TRISTE" },
+        { def: "Opposto di aperto.", word: "CHIUSO" },
+        { def: "Opposto di pieno.", word: "VUOTO" },
+        { def: "Opposto di facile.", word: "DIFFICILE" },
+        { def: "Opposto di chiaro.", word: "SCURO" },
+        { def: "Primo giorno della settimana.", word: "LUNEDÌ" },
+        { def: "Ultimo giorno della settimana.", word: "DOMENICA" },
+        { def: "Mese del Natale.", word: "DICEMBRE" },
+        { def: "Mese delle vacanze.", word: "AGOSTO" },
+        { def: "Stagione dei fiori.", word: "PRIMAVERA" },
+        { def: "Stagione del caldo.", word: "ESTATE" },
+        { def: "Stagione delle foglie.", word: "AUTUNNO" },
+        { def: "Stagione della neve.", word: "INVERNO" },
+        { def: "Si studia lì.", word: "SCUOLA" },
+        { def: "Si comprano le cose.", word: "NEGOZIO" }
+    ];
+
+    // Variabili di stato
+    let currentWord = "";
+    let currentDefinition = "";
+    let score = 0;
+    let attempts = 0;
+    let timerValue = 60;
+    let letterIntervalValue = 4;
+    let currentTime = 60;
+    let timerInterval = null;
+    let letterInterval = null;
+    let isRunning = false;
+    let revealedIndices = [0];
+    let gameStarted = false;
+    let isLoading = false;
+    let usedWords = [];
+
+    // Elementi DOM
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerInput = document.getElementById('timerInput');
+    const letterIntervalInput = document.getElementById('letterIntervalInput');
+    const progressFill = document.getElementById('progressFill');
+    const definitionEl = document.getElementById('definition');
+    const wordDisplay = document.getElementById('word-display');
+    const wordInput = document.getElementById('wordInput');
+    const messageContainer = document.getElementById('messageContainer');
+    const scoreEl = document.getElementById('score');
+    const attemptsEl = document.getElementById('attempts');
+    const btnStart = document.getElementById('btnStart');
+    const btnStop = document.getElementById('btnStop');
+    const btnNew = document.getElementById('btnNew');
+    const gameOverEl = document.getElementById('gameOver');
+    const finalScoreEl = document.getElementById('finalScore');
+    const finalAttemptsEl = document.getElementById('finalAttempts');
+    const sourceBadge = document.getElementById('source-badge');
+    const hintText = document.getElementById('hintText');
+    const statsInfo = document.getElementById('statsInfo');
+
+    // Carica parole usate dal localStorage
+    function loadUsedWords() {
+        usedWords = JSON.parse(localStorage.getItem('usedWords') || '[]');
+        updateStatsInfo();
+    }
+
+    // Salva parole usate nel localStorage
+    function saveUsedWord(word) {
+        if (!usedWords.includes(word.toLowerCase())) {
+            usedWords.push(word.toLowerCase());
+            // Mantieni solo le ultime 500 parole usate
+            if (usedWords.length > 500) {
+                usedWords = usedWords.slice(-500);
+            }
+            localStorage.setItem('usedWords', JSON.stringify(usedWords));
+            updateStatsInfo();
+        }
+    }
+
+    // Aggiorna info statistiche
+    function updateStatsInfo() {
+        statsInfo.innerText = `Parole usate: ${usedWords.length} / ${wiktionaryWords.length}+`;
+    }
+
+    // Cerca su Wikizionario
+    async function fetchFromWiktionary(word) {
+        try {
+            const response = await fetch(
+                `https://it.wiktionary.org/w/api.php?action=query&prop=extracts&format=json&origin=*&titles=${word}&exintro=1&explaintext=1`
+            );
+            const data = await response.json();
+            
+            const pages = data.query.pages;
+            const pageId = Object.keys(pages)[0];
+            
+            if (pageId !== "-1" && pages[pageId].extract) {
+                let extract = pages[pageId].extract;
+                
+                // Pulisci la definizione - prendi la prima frase significativa
+                const sentences = extract.split('.');
+                let definition = sentences[0];
+                
+                // Rimuovi parti tecniche come "(sostantivo)", "(verbo)", ecc.
+                definition = definition.replace(/\([^)]*\)/g, '').trim();
+                definition = definition.substring(0, 250);
+                
+                if (definition.length > 10) {
+                    return definition + ".";
+                }
+            }
+        } catch (error) {
+            console.log("Wikizionario non disponibile:", error);
+        }
+        
+        return null;
+    }
+
+    // Ottieni parola casuale NON usata
+    function getRandomUnusedWord() {
+        // Filtra parole già usate
+        const availableWords = wiktionaryWords.filter(w => !usedWords.includes(w.toLowerCase()));
+        
+        // Se tutte le parole sono state usate, resetta
+        if (availableWords.length === 0) {
+            usedWords = [];
+            localStorage.setItem('usedWords', '[]');
+            updateStatsInfo();
+            return getRandomUnusedWord();
+        }
+        
+        // Selezione veramente casuale
+        const randomIndex = Math.floor(Math.random() * availableWords.length);
+        return availableWords[randomIndex];
+    }
+
+    // Ottieni dal database locale
+    function getFromLocalDatabase() {
+        const randomIndex = Math.floor(Math.random() * localDatabase.length);
+        return localDatabase[randomIndex];
+    }
+
+    // Carica nuova parola (da Wikizionario o locale)
+    async function loadNewWord() {
+        isLoading = true;
+        btnNew.disabled = true;
+        if (!isRunning) {
+            btnStart.disabled = true;
+        }
+        
+        definitionEl.innerHTML = '<span class="loading-spinner"></span>Caricamento da Wikizionario...';
+        sourceBadge.innerText = "📚 Wikizionario";
+        updateStatsInfo();
+        
+        // Ottieni parola casuale non usata
+        const randomWord = getRandomUnusedWord();
+        
+        // Cerca su Wikizionario
+        const definition = await fetchFromWiktionary(randomWord);
+        
+        if (definition) {
+            currentWord = randomWord.toUpperCase();
+            currentDefinition = definition;
+            sourceBadge.innerText = "📚 Wikizionario";
+            saveUsedWord(randomWord);
+        } else {
+            // Fallback su database locale
+            const localResult = getFromLocalDatabase();
+            currentWord = localResult.word.toUpperCase();
+            currentDefinition = localResult.def;
+            sourceBadge.innerText = "💾 Database Locale";
+        }
+        
+        definitionEl.innerText = currentDefinition;
+        
+        // Reset lettere rivelate (solo prima, MAI l'ultima)
+        revealedIndices = [0];
+        wordInput.value = '';
+        wordInput.className = 'word-input';
+        messageContainer.innerHTML = '';
+        
+        renderWord();
+        
+        isLoading = false;
+        if (!isRunning && !gameStarted) {
+            btnStart.disabled = false;
+        }
+        btnNew.disabled = false;
+    }
+
+    // Aggiorna le impostazioni
+    function updateSettings() {
+        const newTimerValue = parseInt(timerInput.value);
+        const newLetterInterval = parseInt(letterIntervalInput.value);
+        
+        if (newTimerValue >= 10 && newTimerValue <= 300) {
+            timerValue = newTimerValue;
+            if (!isRunning) {
+                currentTime = newTimerValue;
+                updateTimerDisplay();
+            }
+        } else {
+            showMessage("Timer: inserisci un valore tra 10 e 300 secondi", "wrong");
+            return;
+        }
+        
+        if (newLetterInterval >= 1 && newLetterInterval <= 60) {
+            letterIntervalValue = newLetterInterval;
+        } else {
+            showMessage("Cadenza: inserisci un valore tra 1 e 60 secondi", "wrong");
+            return;
+        }
+        
+        showMessage("Impostazioni aggiornate! Tempo: " + timerValue + "s, Lettere ogni: " + letterIntervalValue + "s", "timeout");
+    }
+
+    // Aggiorna il display del timer
+    function updateTimerDisplay() {
+        timerDisplay.innerText = currentTime;
+        const percentage = (currentTime / timerValue) * 100;
+        progressFill.style.width = percentage + '%';
+        
+        timerDisplay.classList.remove('warning', 'danger');
+        if (currentTime <= 10) {
+            timerDisplay.classList.add('danger');
+        } else if (currentTime <= 20) {
+            timerDisplay.classList.add('warning');
+        }
+    }
+
+    // Nuova parola
+    function newGame() {
+        if (isLoading) return;
+        
+        // Ferma i timer se sono attivi
+        stopTimer();
+        
+        // Reset stato
+        gameStarted = false;
+        currentTime = timerValue;
+        updateTimerDisplay();
+        
+        // Carica nuova parola
+        loadNewWord();
+        
+        showMessage("Nuova parola caricata! Premi 'Avvia Timer'", "timeout");
+    }
+
+    // Renderizza la parola con lettere e lineette
+    function renderWord() {
+        wordDisplay.innerHTML = '';
+        const lastLetterIndex = currentWord.length - 1;
+
+        for (let i = 0; i < currentWord.length; i++) {
+            const span = document.createElement('span');
+            span.className = 'letter';
+
+            // L'ultima lettera NON viene mai rivelata automaticamente
+            if (i === lastLetterIndex) {
+                if (revealedIndices.includes(i)) {
+                    span.innerText = currentWord.charAt(i);
+                    span.classList.add('revealed', 'hidden-final');
+                } else {
+                    const underscore = document.createElement('span');
+                    underscore.className = 'underscore';
+                    underscore.style.borderColor = '#e74c3c';
+                    span.appendChild(underscore);
+                }
+            } else if (revealedIndices.includes(i)) {
+                span.innerText = currentWord.charAt(i);
+                span.classList.add('revealed');
+            } else {
+                const underscore = document.createElement('span');
+                underscore.className = 'underscore';
+                span.appendChild(underscore);
+            }
+            wordDisplay.appendChild(span);
+        }
+    }
+
+    // Avvia il timer
+    function startTimer() {
+        if (isRunning || isLoading) return;
+        
+        if (!gameStarted) {
+            gameStarted = true;
+            currentTime = timerValue;
+        }
+        
+        if (currentTime <= 0) {
+            endGame();
+            return;
+        }
+        
+        isRunning = true;
+        wordInput.disabled = false;
+        wordInput.focus();
+        btnStart.disabled = true;
+        btnStop.disabled = false;
+        btnNew.disabled = true;
+        
+        // Timer del conto alla rovescia (ogni 1 secondo)
+        timerInterval = setInterval(() => {
+            currentTime--;
+            updateTimerDisplay();
+            
+            if (currentTime <= 0) {
+                endGame();
+            }
+        }, 1000);
+        
+        // Timer per rivelare lettere (ogni X secondi configurabili)
+        letterInterval = setInterval(() => {
+            revealRandomLetter();
+        }, letterIntervalValue * 1000);
+        
+        showMessage("Timer avviato! Una lettera ogni " + letterIntervalValue + " secondi...", "correct");
+    }
+
+    // Rivela una lettera casuale (MAI l'ultima)
+    function revealRandomLetter() {
+        const lastLetterIndex = currentWord.length - 1;
+        const hiddenIndices = [];
+        
+        for (let i = 0; i < currentWord.length; i++) {
+            // Non includere l'ultima lettera nelle rivelazioni automatiche
+            if (!revealedIndices.includes(i) && i !== lastLetterIndex) {
+                hiddenIndices.push(i);
+            }
+        }
+        
+        if (hiddenIndices.length > 0) {
+            const randomIndex = hiddenIndices[Math.floor(Math.random() * hiddenIndices.length)];
+            revealedIndices.push(randomIndex);
+            renderWord();
+        }
+    }
+
+    // Invia risposta (pulsante STOP)
+    function submitAnswer() {
+        if (!isRunning || isLoading) return;
+        
+        const userAnswer = wordInput.value.trim().toUpperCase();
+        
+        if (userAnswer.length === 0) {
+            showMessage("⚠️ Scrivi una parola prima di premere STOP!", "wrong");
+            return;
+        }
+        
+        attempts++;
+        attemptsEl.innerText = attempts;
+        
+        if (userAnswer === currentWord) {
+            // ✅ RISPOSTA CORRETTA
+            score++;
+            scoreEl.innerText = score;
+            showMessage("🎉 CORRETTO! +1 punto", "correct");
+            
+            wordInput.className = 'word-input correct';
+            
+            // Mostra tutta la parola (inclusa l'ultima)
+            revealedIndices = [];
+            for (let i = 0; i < currentWord.length; i++) {
+                revealedIndices.push(i);
+            }
+            renderWord();
+            
+            // Carica nuova parola SENZA fermare il timer
+            setTimeout(() => {
+                loadNewWord();
+            }, 2000);
+        } else {
+            // ❌ RISPOSTA SBAGLIATA - LA PAROLA RIMANE!
+            showMessage("❌ SBAGLIATO! Riprova...", "wrong");
+            
+            wordInput.className = 'word-input wrong';
+            wordInput.value = '';
+            wordInput.focus();
+            
+            // IL TIMER CONTINUA, LE LETTERE CONTINUANO AD APPARIRE
+            // La parola NON cambia!
+        }
+    }
+
+    // Fine gioco (tempo scaduto)
+    function endGame() {
+        stopTimer();
+        finalScoreEl.innerText = score;
+        finalAttemptsEl.innerText = attempts;
+        gameOverEl.style.display = 'flex';
+    }
+
+    // Ferma il timer
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        if (letterInterval) {
+            clearInterval(letterInterval);
+            letterInterval = null;
+        }
+        isRunning = false;
+        wordInput.disabled = true;
+        btnStart.disabled = false;
+        btnStop.disabled = true;
+    }
+
+    // Ricomincia il gioco
+    function resetGame() {
+        score = 0;
+        attempts = 0;
+        scoreEl.innerText = '0';
+        attemptsEl.innerText = '0';
+        currentTime = timerValue;
+        updateTimerDisplay();
+        gameStarted = false;
+        gameOverEl.style.display = 'none';
+        usedWords = [];
+        localStorage.setItem('usedWords', '[]');
+        updateStatsInfo();
+        newGame();
+    }
+
+    // Mostra messaggio
+    function showMessage(text, type) {
+        messageContainer.innerHTML = '<div class="message ' + type + '">' + text + '</div>';
+    }
+
+    // Gestione tasto Enter
+    wordInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter' && isRunning) {
+            submitAnswer();
+        }
+    });
+
+    // Avvia il gioco all'apertura
+    loadUsedWords();
+    loadNewWord();
+</script>
+
+</body>
+</html>
